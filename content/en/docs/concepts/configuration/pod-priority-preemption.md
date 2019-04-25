@@ -34,7 +34,7 @@ Kubernetes Version | Priority and Preemption State | Enabled by default
 1.9                | alpha                         | no
 1.10               | alpha                         | no
 1.11               | beta                          | yes
-1.14               | GA                            | yes
+1.14               | stable                        | yes
 
 {{< warning >}}In a cluster where not all users are trusted, a
 malicious user could create pods at the highest possible priorities, causing
@@ -75,6 +75,13 @@ Pods.
 In Kubernetes 1.12+, critical pods rely on scheduler preemption to be scheduled
 when a cluster is under resource pressure. For this reason, it is not
 recommended to disable preemption.
+{{< /note >}}
+
+{{< note >}}
+In Kubernetes 1.15 and later,
+if the feature `NonPreemptingPriority` is enabled,
+PriorityClasses have the option to set `preemptionPolicy: Never`.
+This will prevent pods of that PriorityClass from preempting other pods.
 {{< /note >}}
 
 In Kubernetes 1.11 and later, preemption is controlled by a kube-scheduler flag
@@ -136,13 +143,62 @@ cluster when they should use this PriorityClass.
 ### Example PriorityClass
 
 ```yaml
-apiVersion: scheduling.k8s.io/v1beta1
+apiVersion: scheduling.k8s.io/v1
 kind: PriorityClass
 metadata:
   name: high-priority
 value: 1000000
 globalDefault: false
 description: "This priority class should be used for XYZ service pods only."
+```
+
+### Non-preempting PriorityClasses (alpha) {#non-preempting-priority-class}
+
+1.15 adds the `PreemptionPolicy` field as an alpha feature.
+It is disabled by default in 1.15,
+and requires the `NonPreemptingPriority`[feature gate](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+) to be enabled.
+
+Pods with `PreemptionPolicy: Never` will be placed in the scheduling queue
+ahead of lower-priority pods,
+but they cannot preempt other pods.
+A non-preempting pod waiting to be scheduled will stay in the scheduling queue,
+until sufficient resources are free,
+and it can be scheduled.
+Non-preempting pods,
+like other pods,
+are subject to scheduler back-off.
+This means that if the scheduler tries these pods and they cannot be scheduled,
+they will be retried with lower frequency,
+allowing other pods with lower priority to be scheduled before them.
+
+Non-preempting pods may still be preempted by other,
+high-priority pods.
+
+`PreemptionPolicy` defaults to `PreemptLowerPriority`,
+which will allow pods of that PriorityClass to preempt lower-priority pods
+(as is existing default behavior).
+If `PreemptionPolicy` is set to `Never`,
+pods in that PriorityClass will be non-preempting.
+
+An example use case is for data science workloads.
+A user may submit a job that they want to be prioritized above other workloads,
+but do not wish to discard existing work by preempting running pods.
+The high priority job with `PreemptionPolicy: Never` will be scheduled
+ahead of other queued pods,
+as soon as sufficient cluster resources "naturally" become free.
+
+#### Example Non-preempting PriorityClass
+
+```yaml
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority-nonpreempting
+value: 1000000
+preemptionPolicy: Never
+globalDefault: false
+description: "This priority class will not cause other pods to be preempted."
 ```
 
 ## Pod priority
@@ -278,9 +334,8 @@ preempted. Here's an example:
 If Pod Q were removed from its Node, the Pod anti-affinity violation would be
 gone, and Pod P could possibly be scheduled on Node N.
 
-We may consider adding cross Node preemption in future versions if we find an
-algorithm with reasonable performance. We cannot promise anything at this point,
-and cross Node preemption will not be considered a blocker for Beta or GA.
+We may consider adding cross Node preemption in future versions if there is
+enough demand and if we find an algorithm with reasonable performance.
 
 ## Debugging Pod Priority and Preemption
 

@@ -3,6 +3,7 @@ Add a new local etcd member
 
 ### Synopsis
 
+
 Add a new local etcd member
 
 ```
@@ -14,6 +15,7 @@ kubeadm join phase control-plane-join etcd [flags]
 ```
       --apiserver-advertise-address string   If the node should host a new control plane instance, the IP address the API Server will advertise it's listening on. If not set the default network interface will be used.
       --config string                        Path to kubeadm config file.
+      --control-plane                        Create a new control plane instance on this node
       --experimental-control-plane           Create a new control plane instance on this node
   -h, --help                                 help for etcd
       --node-name string                     Specify the node name.
@@ -21,7 +23,22 @@ kubeadm join phase control-plane-join etcd [flags]
 
 ### Options inherited from parent commands
 
-```
-      --rootfs string   [EXPERIMENTAL] The path to the 'real' host root filesystem.
-```
+<table style="width: 100%; table-layout: fixed;">
+  <colgroup>
+    <col span="1" style="width: 10px;" />
+    <col span="1" />
+  </colgroup>
+  <tbody>
+
+    <tr>
+      <td colspan="2">--rootfs string</td>
+    </tr>
+    <tr>
+      <td></td><td style="line-height: 130%; word-wrap: break-word;">[EXPERIMENTAL] The path to the 'real' host root filesystem.</td>
+    </tr>
+
+  </tbody>
+</table>
+
+
 

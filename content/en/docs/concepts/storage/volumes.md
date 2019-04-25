@@ -166,12 +166,34 @@ A `azureDisk` is used to mount a Microsoft Azure [Data Disk](https://azure.micro
 
 More details can be found [here](https://github.com/kubernetes/examples/tree/{{< param "githubbranch" >}}/staging/volumes/azure_disk/README.md).
 
+#### CSI Migration
+
+{{< feature-state for_k8s_version="v1.15" state="alpha" >}}
+
+The CSI Migration feature for azureDisk, when enabled, shims all plugin operations
+from the existing in-tree plugin to the `disk.csi.azure.com` Container
+Storage Interface (CSI) Driver. In order to use this feature, the [Azure Disk CSI
+Driver](https://github.com/kubernetes-sigs/azuredisk-csi-driver)
+must be installed on the cluster and the `CSIMigration` and `CSIMigrationAzureDisk`
+Alpha features must be enabled.
+
 ### azureFile {#azurefile}
 
 A `azureFile` is used to mount a Microsoft Azure File Volume (SMB 2.1 and 3.0)
 into a Pod.
 
 More details can be found [here](https://github.com/kubernetes/examples/tree/{{< param "githubbranch" >}}/staging/volumes/azure_file/README.md).
+
+#### CSI Migration
+
+{{< feature-state for_k8s_version="v1.15" state="alpha" >}}
+
+The CSI Migration feature for azureFile, when enabled, shims all plugin operations
+from the existing in-tree plugin to the `file.csi.azure.com` Container
+Storage Interface (CSI) Driver. In order to use this feature, the [Azure File CSI
+Driver](https://github.com/kubernetes-sigs/azurefile-csi-driver)
+must be installed on the cluster and the `CSIMigration` and `CSIMigrationAzureFile`
+Alpha features must be enabled.
 
 ### cephfs {#cephfs}
 
@@ -477,7 +499,7 @@ mounts an empty directory and clones a git repository into it for your Pod to
 use.  In the future, such volumes may be moved to an even more decoupled model,
 rather than extending the Kubernetes API for every such use case.
 
-Here is an example for gitRepo volume:
+Here is an example of gitRepo volume:
 
 ```yaml
 apiVersion: v1
@@ -619,7 +641,7 @@ be able to run. Applications using local volumes must be able to tolerate this
 reduced availability, as well as potential data loss, depending on the
 durability characteristics of the underlying disk.
 
-The following is an example PersistentVolume spec using a `local` volume and
+The following is an example of PersistentVolume spec using a `local` volume and
 `nodeAffinity`:
 
 ```yaml
@@ -931,7 +953,7 @@ You must have an existing ScaleIO cluster already setup and
 running with the volumes created before you can use them.
 {{< /caution >}}
 
-The following is an example Pod configuration with ScaleIO:
+The following is an example of Pod configuration with ScaleIO:
 
 ```yaml
 apiVersion: v1
@@ -958,7 +980,7 @@ spec:
       fsType: xfs
 ```
 
-For further detail, please the see the [ScaleIO examples](https://github.com/kubernetes/examples/tree/{{< param "githubbranch" >}}/staging/volumes/scaleio).
+For further detail, please see the [ScaleIO examples](https://github.com/kubernetes/examples/tree/{{< param "githubbranch" >}}/staging/volumes/scaleio).
 
 ### secret {#secret}
 
@@ -1043,7 +1065,7 @@ A `vsphereVolume` is used to mount a vSphere VMDK Volume into your Pod.  The con
 of a volume are preserved when it is unmounted. It supports both VMFS and VSAN datastore.
 
 {{< caution >}}
-You must create VMDK using one of the following method before using with Pod.
+You must create VMDK using one of the following methods before using with Pod.
 {{< /caution >}}
 
 #### Creating a VMDK volume
@@ -1132,7 +1154,7 @@ spec:
 
 ### Using subPath with expanded environment variables
 
-{{< feature-state for_k8s_version="v1.14" state="alpha" >}}
+{{< feature-state for_k8s_version="v1.15" state="beta" >}}
 
 
 Use the `subPathExpr` field to construct `subPath` directory names from Downward API environment variables.
@@ -1293,7 +1315,7 @@ Learn how to
 
 #### CSI ephemeral volumes
 
-{{< feature-state for_k8s_version="v1.14" state="alpha" >}}
+{{< feature-state for_k8s_version="v1.15" state="alpha" >}}
 
 This feature allows CSI volumes to be directly embedded in the Pod specification instead of a PersistentVolume. Volumes specified in this way are ephemeral and do not persist across Pod restarts.
 
@@ -1344,7 +1366,7 @@ configuration changes to existing Storage Classes, PVs or PVCs (referring to
 in-tree plugins) when transitioning to a CSI driver that supersedes an in-tree plugin.
 
 In the alpha state, the operations and features that are supported include 
-provisioning/delete, attach/detach and mount/unmount of volumes with `volumeMode` set to `filesystem`
+provisioning/delete, attach/detach, mount/unmount and resizing of volumes.
 
 In-tree plugins that support CSI Migration and have a corresponding CSI driver implemented 
 are listed in the "Types of Volumes" section above.

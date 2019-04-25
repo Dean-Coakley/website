@@ -136,6 +136,9 @@ Here is an example set of resources users may want to put under object count quo
 * `count/cronjobs.batch`
 * `count/deployments.extensions`
 
+The 1.15 release added support for custom resources using the same syntax.
+For example, to create a quota on a `widgets` custom resource in the `example.com` API group, use `count/widgets.example.com`.
+
 When using `count/*` resource quota, an object is charged against the quota if it exists in server storage.
 These types of quotas are useful to protect against exhaustion of storage resources.  For example, you may
 want to quota the number of secrets in a server given their large size.  Too many secrets in a cluster can
@@ -200,11 +203,6 @@ You can control a pod's consumption of system resources based on a pod's priorit
 field in the quota spec.
 
 A quota is matched and consumed only if `scopeSelector` in the quota spec selects the pod.
-
-{{< note >}}
-You need to enable the feature gate `ResourceQuotaScopeSelectors`before using resource quotas
-per PriorityClass.
-{{< /note >}}
 
 This example creates a quota object and matches it with pods at specific priorities. The example
 works as follows:
@@ -537,7 +535,7 @@ restrictions around nodes: pods from several namespaces may run on the same node
 
 It may be desired that pods at a particular priority, eg. "cluster-services", should be allowed in a namespace, if and only if, a matching quota object exists.
 
-With this mechanism, operators will be able to restrict usage of certain high priority classes to a limited number of namespaces and not every namespaces will be able to consume these priority classes by default.
+With this mechanism, operators will be able to restrict usage of certain high priority classes to a limited number of namespaces and not every namespace will be able to consume these priority classes by default.
 
 To enforce this, kube-apiserver flag `--admission-control-config-file` should be used to pass path to the following configuration file:
 
